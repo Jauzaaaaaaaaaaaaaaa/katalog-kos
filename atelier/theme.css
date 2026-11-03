@@ -1,0 +1,47 @@
+/* KATALOG KOS: gambar kerja arsitek. Kertas kalkir, garis ukuran, biru cetak, terakota. */
+:root {
+  --ink: #15202c; --paper: #fbfaf6; --soft: #eeece4; --yellow: #eeece4; --cyan: #1d4ed8; --pink: #c9532a; --grey: #66707c;
+  --border: 1px solid var(--ink); --shadow: 0 0 0 transparent; --shadow-sm: 0 0 0 transparent;
+  --at-bg: #eeece4; --at-ink: #15202c; --at-accent: #1d4ed8; --at-on-accent: #eef3ff; --at-deep: #122f86; --at-on-deep: #eef3ff; --at-mono: "Space Mono", monospace;
+}
+html { background: #eeece4; }
+body, body.at {
+  background-color: transparent !important;
+  background-image: linear-gradient(rgba(29, 78, 216, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(29, 78, 216, .07) 1px, transparent 1px), linear-gradient(rgba(29, 78, 216, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(29, 78, 216, .035) 1px, transparent 1px) !important;
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px !important;
+  color: var(--ink);
+}
+
+/* Layar pembuka: denah kamar tergambar */
+.kos-plan { width: min(70vw, 340px); color: #eef3ff; }
+.kos-plan path, .kos-plan rect, .kos-plan line { fill: none; stroke: currentColor; stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; animation: kos-draw 1.3s var(--at-ease) forwards; }
+.kos-plan .thin { stroke-width: .8; animation-delay: .5s; }
+.kos-plan text { fill: currentColor; font: 10px "Space Mono", monospace; letter-spacing: .08em; opacity: 0; animation: kos-fade .5s 1.1s forwards; }
+@keyframes kos-draw { to { stroke-dashoffset: 0; } }
+@keyframes kos-fade { to { opacity: 1; } }
+.at-curtain__a, .at-curtain__b { border-radius: 0; inset: 0; }
+.at-curtain__b { background-image: linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px); background-size: 28px 28px; }
+
+/* Bar atas: kop gambar */
+.top { background: rgba(238, 236, 228, .86); backdrop-filter: blur(10px); }
+.brand__mark { background: var(--cyan); color: #fff; box-shadow: none; border-radius: 0; }
+
+/* Judul besar dengan garis ukuran */
+.gw__title { position: relative; display: inline-block; font-weight: 500; letter-spacing: -.05em; padding-bottom: 20px; font-size: clamp(3rem, 11vw, 9rem); line-height: .95; }
+.gw__title::after { content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 9px; border-inline: 1px solid var(--pink); background: linear-gradient(var(--pink), var(--pink)) center / 100% 1px no-repeat; }
+.gw__tag { background: transparent !important; box-shadow: none !important; border: 0 !important; padding-left: 0 !important; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
+/* Semua kotak: garis tipis dengan tanda potong di sudut */
+.gw__cards > * { position: relative; background: var(--paper) !important; border: var(--border) !important; box-shadow: none !important; border-radius: 0 !important; transition: transform .6s var(--at-out); }
+.gw__cards > *:hover { transform: translateY(-4px); }
+.gw__cards > *::before, .gw__cards > *::after { content: ""; position: absolute; width: 18px; height: 18px; pointer-events: none; }
+.gw__cards > *::before { left: -10px; top: -10px; border-left: 1px solid var(--pink); border-top: 1px solid var(--pink); }
+.gw__cards > *::after { right: -10px; bottom: -10px; border-right: 1px solid var(--pink); border-bottom: 1px solid var(--pink); }
+
+button, .btn, input, select, textarea { border-radius: 0 !important; box-shadow: none !important; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+
+/* Warna lencana dan tombol mengikuti palet gambar kerja */
+.gw__cards [class*="btn"], .gw__cards button { background: var(--cyan) !important; color: #fff !important; border: 0 !important; }
+.gw__cards [class*="pass"], .gw__cards [class*="badge"], .gw__cards [class*="tag"] { background: transparent !important; color: var(--pink) !important; border: 1px solid var(--pink) !important; box-shadow: none !important; font-family: var(--mono); }
+.gw__cards [class*="chip"], .gw__cards li { background: transparent !important; box-shadow: none !important; }

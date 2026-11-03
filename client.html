@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Kos pilihan untukmu | Kos Modern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/app.css" />
+<link rel="stylesheet" href="atelier/atelier.css">
+<link rel="stylesheet" href="atelier/theme.css">
+<script src="atelier/theme.js"></script>
+<script src="atelier/atelier.js"></script>
+</head>
+<body data-page="client" class="is-client">
+
+  <header class="top">
+    <div class="wrap top__in">
+      <a class="brand" href="index.html"><span class="brand__mark">K</span><span class="brand__txt">Kos Modern</span></a>
+      <div class="timer" id="timer" hidden role="timer" aria-label="Waktu tersisa">
+        <span class="timer__lbl"><span class="dot dot--run"></span>Waktu tersisa</span>
+        <b class="timer__val" id="tVal">00:00</b>
+        <span class="timer__bar"><i id="tBar"></i></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap cmain is-blurred" id="cMain">
+    <div class="chello" id="cHello" hidden>
+      <p class="chello__tag">Pilihan admin untuk</p>
+      <h1 id="cName"></h1>
+      <p>Admin memilihkan <b id="cCount">0</b> kos yang cocok dengan kebutuhanmu. Lihat foto dan video, baca detailnya, dan unduh PDF selama waktu berjalan.</p>
+    </div>
+    <div class="cmsg" id="cMsg" hidden></div>
+    <div class="list list--client" id="cList"></div>
+  </main>
+
+  <!-- ===== Pop up mulai ===== -->
+  <dialog id="startDlg" class="dlg dlg--start" aria-labelledby="sTitle">
+    <div class="dlg__body dlg__body--start">
+      <span class="sicon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9 3h6M5 5.5L7 7.5M19 5.5l-2 2"/></svg>
+      </span>
+      <span class="gtag gtag--pink">Sesi preview berwaktu</span>
+      <h2 id="sTitle">Halo <span id="sName"></span>, kamu punya <span id="sMin">10</span> menit untuk melihat kos pilihanmu</h2>
+      <p>Begitu kamu menekan Mulai, hitung mundur langsung berjalan dan tidak bisa dijeda. Gunakan waktunya untuk memeriksa tiap kos dengan teliti.</p>
+      <ul class="schecks">
+        <li><span class="tick">&#10003;</span><span>Akses <b id="sJumlah">0</b> kos pilihan admin yang disesuaikan untukmu</span></li>
+        <li><span class="tick">&#10003;</span><span>Lihat foto, video, harga, dan lokasi, serta unduh PDF</span></li>
+        <li><span class="tick tick--lock">&#9679;</span><span>Halaman ini dilindungi: screenshot tidak diizinkan untuk client</span></li>
+      </ul>
+      <p class="err" data-err="start"></p>
+      <button type="button" class="btn btn--green btn--wide" id="sStart"><span>Siap (Mulai <span class="sMin2">10</span> Menit) &rarr;</span></button>
+      <button type="button" class="btn btn--outline btn--wide" id="sBack">Kembali</button>
+    </div>
+  </dialog>
+
+  <!-- ===== Pop up waktu habis ===== -->
+  <dialog id="endDlg" class="dlg dlg--start dlg--end" aria-labelledby="eTitle">
+    <div class="dlg__body dlg__body--start">
+      <span class="sicon sicon--end" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="7.5"/><path d="M12 9v4l2.5 2M9 3h6"/></svg>
+      </span>
+      <span class="gtag gtag--yellow">Sesi selesai</span>
+      <h2 id="eTitle">Waktu habis</h2>
+      <p id="endText">Sesi kamu sudah selesai. Terima kasih sudah melihat kos pilihan. Kalau masih ingin melihat lagi, hubungi admin untuk sesi baru.</p>
+      <button type="button" class="btn btn--yellow btn--wide" id="eBack">Kembali ke beranda</button>
+    </div>
+  </dialog>
+
+  <!-- ===== Info kos ===== -->
+  <dialog id="infoDlg" class="dlg dlg--info" aria-labelledby="infoTitle">
+    <div class="dlg__head">
+      <h2 id="infoTitle">Info kos</h2>
+      <button type="button" class="iconbtn" data-close aria-label="Tutup">&times;</button>
+    </div>
+    <div class="dlg__body dlg__body--info" id="infoBody"></div>
+  </dialog>
+
+  <!-- ===== Foto sampul ===== -->
+  <dialog id="lightbox" class="lightbox" aria-label="Foto kos">
+    <button type="button" class="lb__close" data-close aria-label="Tutup">&times;</button>
+    <button type="button" class="lb__nav lb__prev" id="lbPrev" aria-label="Foto sebelumnya">&#8249;</button>
+    <figure>
+      <img id="lbImg" alt="" draggable="false" />
+      <figcaption id="lbCap"></figcaption>
+    </figure>
+    <button type="button" class="lb__nav lb__next" id="lbNext" aria-label="Foto berikutnya">&#8250;</button>
+  </dialog>
+
+  <div class="wm" id="wm" hidden aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <div id="printSheet" aria-hidden="true"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/client.js"></script>
+</body>
+</html>

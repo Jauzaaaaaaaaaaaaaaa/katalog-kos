@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Kos Modern | Pilih jalurmu</title>
+  <meta name="description" content="Masuk sebagai admin atau client untuk melihat kos pilihan." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/app.css" />
+<link rel="stylesheet" href="atelier/atelier.css">
+<link rel="stylesheet" href="atelier/theme.css">
+<script src="atelier/theme.js"></script>
+<script src="atelier/atelier.js"></script>
+</head>
+<body data-page="gate">
+
+  <div class="banner" id="banner" hidden>Database belum terhubung. Isi <b>config.js</b> terlebih dahulu (lihat README).</div>
+
+  <header class="top">
+    <div class="wrap top__in">
+      <a class="brand" href="index.html"><span class="brand__mark">K</span><span class="brand__txt">Kos Modern</span></a>
+    </div>
+  </header>
+
+  <main class="wrap gw">
+    <p class="gw__tag"><span class="dot dot--run"></span>Pilihan kos yang dikurasi</p>
+    <h1 class="gw__title">Pilih jalurmu.</h1>
+    <p class="gw__sub">Admin mengelola katalog dan membuat username. Client melihat kos pilihan admin lewat username, dengan waktu yang dibatasi.</p>
+
+    <div class="gw__cards">
+      <section class="gcard gcard--admin" aria-labelledby="gaTitle">
+        <span class="gtag gtag--yellow">Admin pass</span>
+        <h2 id="gaTitle">Admin Portal</h2>
+        <p>Kelola katalog kos, buat username untuk client, dan pantau siapa yang sedang melihat kos.</p>
+        <ul class="chips chips--plain">
+          <li>Katalog kos</li><li>Username client</li><li>Pengawasan</li>
+        </ul>
+        <a class="btn btn--yellow btn--wide" href="admin.html">Masuk sebagai Admin &rarr;</a>
+      </section>
+
+      <section class="gcard gcard--client" aria-labelledby="gcTitle">
+        <span class="gtag gtag--green">Exclusive pass</span>
+        <h2 id="gcTitle">Client Experience</h2>
+        <p>Masukkan username dari admin untuk melihat kos pilihan yang sudah disesuaikan untukmu.</p>
+        <form id="gForm" novalidate>
+          <label class="sr" for="gUser">Username dari admin</label>
+          <input class="input" id="gUser" placeholder="username dari admin" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="40" />
+          <p class="err" data-err="g"></p>
+          <button type="submit" class="btn btn--green btn--wide">Masuk sebagai Client &rarr;</button>
+        </form>
+        <ul class="chips chips--plain">
+          <li>Pilihan admin</li><li>Waktu terbatas</li><li>Unduh PDF</li>
+        </ul>
+      </section>
+    </div>
+
+    <p class="gw__note">Belum punya username? Hubungi admin lewat WhatsApp, ceritakan kebutuhanmu (jenis kos, kisaran harga, dan lokasi), lalu admin akan mengirimkan username.</p>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot__in">
+      <p>Kos Modern</p>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/gate.js"></script>
+</body>
+</html>

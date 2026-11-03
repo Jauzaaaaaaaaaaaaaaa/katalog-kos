@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Admin | Kos Modern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/app.css" />
+<link rel="stylesheet" href="atelier/atelier.css">
+<link rel="stylesheet" href="atelier/theme.css">
+<script src="atelier/theme.js"></script>
+<script src="atelier/atelier.js"></script>
+</head>
+<body data-page="admin">
+
+  <header class="top">
+    <div class="wrap top__in top__in--admin">
+      <a class="brand" href="index.html"><span class="brand__mark">K</span><span class="brand__txt">Kos Admin</span></a>
+      <nav class="tabs" id="navTabs" aria-label="Menu admin" hidden>
+        <a href="#katalog" data-view="katalog">Katalog</a>
+        <a href="#username" data-view="username">Username</a>
+        <a href="#pantau" data-view="pantau">Pengawasan</a>
+      </nav>
+      <div class="top__user">
+        <span class="whoami" id="whoami" hidden></span>
+        <button type="button" class="btn btn--outline btn--sm" id="logoutBtn" hidden>Keluar</button>
+      </div>
+    </div>
+    <div class="ticker" id="ticker" role="marquee" aria-label="Ringkasan harga kos" hidden>
+      <span class="tk__live"><i></i>LIVE</span>
+      <div class="tk__view"><div class="tk__track" id="tkTrack"></div></div>
+    </div>
+  </header>
+
+  <!-- ===== Pintu login admin ===== -->
+  <main class="wrap gate" id="gate">
+    <div class="gate__card">
+      <span class="gtag gtag--yellow">Admin pass</span>
+      <h1>Masuk sebagai Admin</h1>
+      <p class="gate__note" id="gateNote" hidden>Database belum terhubung. Isi <b>config.js</b> terlebih dahulu (lihat README).</p>
+      <form id="aForm" novalidate>
+        <div class="f">
+          <label for="aEmail">Email</label>
+          <input class="input" id="aEmail" type="email" autocomplete="username" required />
+        </div>
+        <div class="f">
+          <label for="aPass">Kata sandi</label>
+          <input class="input" id="aPass" type="password" autocomplete="current-password" required />
+          <p class="err" data-err="alogin"></p>
+        </div>
+        <button type="submit" class="btn btn--yellow btn--wide">Masuk &rarr;</button>
+      </form>
+      <p class="gate__back"><a href="index.html">&larr; Kembali ke beranda</a></p>
+    </div>
+  </main>
+
+  <div id="adminApp" hidden>
+
+    <!-- ================= KATALOG ================= -->
+    <section id="view-katalog" class="view" hidden>
+      <div class="wrap catbar">
+        <div class="searchbar">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+          <label class="sr" for="q">Cari kos</label>
+          <input id="q" type="search" placeholder="Cari nama kos, alamat, atau fasilitas" autocomplete="off" />
+        </div>
+        <div class="fwrap">
+          <button type="button" id="filterBtn" class="fbtn" aria-expanded="false" aria-controls="filterPanel" aria-label="Buka filter">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2.2"/><circle cx="8" cy="17" r="2.2"/></svg>
+            <span id="fcount" class="fbtn__count" hidden>0</span>
+          </button>
+          <aside class="fpanel" id="filterPanel" aria-label="Filter kos" hidden>
+            <div class="fpanel__head">
+              <h2>Filter</h2>
+              <button type="button" class="iconbtn" id="filterClose" aria-label="Tutup filter">&times;</button>
+            </div>
+            <form id="filterForm" autocomplete="off">
+              <fieldset>
+                <legend>Jenis kos</legend>
+                <label class="row"><input type="radio" name="jenis" value="semua" checked> Semua</label>
+                <label class="row"><input type="radio" name="jenis" value="putra"> Putra</label>
+                <label class="row"><input type="radio" name="jenis" value="putri"> Putri</label>
+                <label class="row"><input type="radio" name="jenis" value="campur"> Campur</label>
+              </fieldset>
+              <fieldset>
+                <legend>Harga per bulan</legend>
+                <div class="slider">
+                  <label for="pmin">Minimum <output id="pminOut"></output></label>
+                  <input type="range" id="pmin" min="0" step="50000" value="0" />
+                </div>
+                <div class="slider">
+                  <label for="pmax">Maksimum <output id="pmaxOut"></output></label>
+                  <input type="range" id="pmax" min="0" step="50000" value="0" />
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend>Fasilitas</legend>
+                <input class="input facsearch" id="facFilterQ" type="search" placeholder="Cari fasilitas (mis. a)" autocomplete="off" aria-label="Cari fasilitas" />
+                <div id="facFilters"></div>
+                <p class="hint hint--tight" id="facFilterNone" hidden>Tidak ada fasilitas yang cocok.</p>
+              </fieldset>
+              <div class="fpanel__foot"><button type="button" class="btn btn--outline btn--sm" id="resetFilters">Reset</button><button type="button" class="btn btn--yellow btn--sm" id="filterDone">Selesai</button></div>
+            </form>
+          </aside>
+        </div>
+      </div>
+
+      <div class="wrap quick">
+        <div class="chips" id="chips" role="group" aria-label="Jenis kos">
+          <button type="button" class="chipbtn" data-jenis="semua" aria-pressed="true">Semua</button>
+          <button type="button" class="chipbtn" data-jenis="putra" aria-pressed="false">Putra</button>
+          <button type="button" class="chipbtn" data-jenis="putri" aria-pressed="false">Putri</button>
+          <button type="button" class="chipbtn" data-jenis="campur" aria-pressed="false">Campur</button>
+        </div>
+        <div class="quick__admin">
+          <button type="button" class="btn btn--outline btn--sm" id="tplBtn">Template CSV</button>
+          <button type="button" class="btn btn--cyan btn--sm" id="csvBtn">Upload CSV</button>
+          <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" hidden />
+          <button type="button" class="btn btn--pink btn--sm" id="addBtn">+ Tambah kos</button>
+        </div>
+      </div>
+
+      <div class="wrap app" id="app">
+        <main class="listing">
+          <div class="listing__bar">
+            <p id="count" class="count" aria-live="polite"></p>
+            <div class="viewsw" id="viewSw" role="group" aria-label="Tampilan daftar">
+              <button type="button" data-v="besar" aria-pressed="true" title="Besar (2 kolom)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="8" height="7"/><rect x="13" y="4" width="8" height="7"/><rect x="3" y="14" width="8" height="7"/><rect x="13" y="14" width="8" height="7"/></svg><span>Besar</span></button>
+              <button type="button" data-v="sedang" aria-pressed="false" title="Sedang (3 kolom)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="4" width="5.5" height="7"/><rect x="9.2" y="4" width="5.5" height="7"/><rect x="16.5" y="4" width="5.5" height="7"/><rect x="2" y="14" width="5.5" height="7"/><rect x="9.2" y="14" width="5.5" height="7"/><rect x="16.5" y="14" width="5.5" height="7"/></svg><span>Sedang</span></button>
+              <button type="button" data-v="kecil" aria-pressed="false" title="Kecil (4 kolom)"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="4" height="4.5"/><rect x="7.3" y="3" width="4" height="4.5"/><rect x="12.6" y="3" width="4" height="4.5"/><rect x="17.9" y="3" width="4" height="4.5"/><rect x="2" y="9.5" width="4" height="4.5"/><rect x="7.3" y="9.5" width="4" height="4.5"/><rect x="12.6" y="9.5" width="4" height="4.5"/><rect x="17.9" y="9.5" width="4" height="4.5"/><rect x="2" y="16" width="4" height="4.5"/><rect x="7.3" y="16" width="4" height="4.5"/><rect x="12.6" y="16" width="4" height="4.5"/><rect x="17.9" y="16" width="4" height="4.5"/></svg><span>Kecil</span></button>
+              <button type="button" data-v="detail" aria-pressed="false" title="Detail (daftar, ada tombol Foto sampul)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg><span>Detail</span></button>
+            </div>
+            <label class="sortsel">Urutkan
+              <select id="sort">
+                <option value="baru">Terbaru</option>
+                <option value="murah">Harga terendah</option>
+                <option value="mahal">Harga tertinggi</option>
+                <option value="nama">Nama A-Z</option>
+                <option value="rating">Rating tertinggi</option>
+              </select>
+            </label>
+          </div>
+          <p id="status" class="status" hidden></p>
+          <div id="list" class="list"></div>
+          <input type="file" id="coverFile" accept="image/*" multiple hidden />
+          <div id="empty" class="empty" hidden>
+            <h2 id="emptyTitle"></h2>
+            <p id="emptyText"></p>
+            <button type="button" class="btn btn--yellow" id="emptyBtn"></button>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- ================= USERNAME ================= -->
+    <section id="view-username" class="view" hidden>
+      <div class="wrap">
+        <div class="vhead">
+          <div>
+            <h1>Username client</h1>
+            <p>Buat username untuk tiap client, isi dengan kos yang cocok untuknya, lalu kirim ke client.</p>
+          </div>
+          <button type="button" class="btn btn--pink" id="cAdd">+ Buat username</button>
+        </div>
+        <div class="toolbar">
+          <div class="searchbar searchbar--sm">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+            <label class="sr" for="cSearch">Cari client</label>
+            <input id="cSearch" type="search" placeholder="Cari nama, username, atau nomor" autocomplete="off" />
+          </div>
+          <div class="chips" id="cChips" role="group" aria-label="Filter status">
+            <button type="button" class="chipbtn" data-s="semua" aria-pressed="true">Semua</button>
+            <button type="button" class="chipbtn" data-s="menunggu" aria-pressed="false">Menunggu</button>
+            <button type="button" class="chipbtn" data-s="berjalan" aria-pressed="false">Berjalan</button>
+            <button type="button" class="chipbtn" data-s="selesai" aria-pressed="false">Selesai</button>
+          </div>
+        </div>
+        <p id="cStatus" class="status" hidden></p>
+        <div id="cList" class="clist"></div>
+        <div id="cEmpty" class="empty" hidden>
+          <h2 id="cEmptyTitle"></h2>
+          <p id="cEmptyText"></p>
+          <button type="button" class="btn btn--yellow" id="cEmptyBtn">+ Buat username</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PENGAWASAN ================= -->
+    <section id="view-pantau" class="view" hidden>
+      <div class="wrap">
+        <div class="vhead">
+          <div>
+            <h1>Pengawasan</h1>
+            <p>Pantau client yang sedang melihat kos, sisa waktunya, dan riwayat harian.</p>
+          </div>
+          <button type="button" class="btn btn--outline btn--sm" id="pRefresh">Segarkan</button>
+        </div>
+        <p id="pStatus" class="status" hidden></p>
+        <div class="stats" id="pStats"></div>
+
+        <h2 class="sech">Sedang berjalan</h2>
+        <div id="pLive" class="plist"></div>
+        <p id="pLiveEmpty" class="muted sech__empty">Belum ada client yang sedang melihat kos.</p>
+
+        <h2 class="sech">Menunggu dimulai</h2>
+        <div id="pWait" class="plist"></div>
+        <p id="pWaitEmpty" class="muted sech__empty">Semua username sudah dipakai.</p>
+
+        <div class="sech sech--bar">
+          <h2>Riwayat</h2>
+          <div class="hfilter">
+            <label class="sr" for="pDate">Tanggal</label>
+            <input type="date" id="pDate" class="input input--sm" />
+            <button type="button" class="chipbtn chipbtn--sm" id="pAll" aria-pressed="false">Semua tanggal</button>
+            <button type="button" class="btn btn--outline btn--sm" id="pCsv">Unduh CSV</button>
+          </div>
+        </div>
+        <div id="pHist" class="phist"></div>
+        <p id="pHistEmpty" class="muted sech__empty" hidden></p>
+      </div>
+    </section>
+  </div>
+
+  <footer class="foot">
+    <div class="wrap foot__in">
+      <p>Halaman admin. Admin bebas melakukan screenshot.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Dialog: tambah / edit kos ===== -->
+  <dialog id="editDlg" class="dlg" aria-labelledby="editTitle">
+    <form id="editForm" novalidate>
+      <div class="dlg__head">
+        <h2 id="editTitle">Tambah kos</h2>
+        <button type="button" class="iconbtn" data-close aria-label="Tutup">&times;</button>
+      </div>
+      <div class="dlg__body">
+        <div class="f">
+          <label for="fNama">Nama kos</label>
+          <input class="input" id="fNama" required maxlength="80" />
+          <p class="err" data-err="fNama"></p>
+        </div>
+        <div class="f">
+          <label for="fAlamat">Alamat</label>
+          <input class="input" id="fAlamat" maxlength="160" />
+        </div>
+        <div class="f">
+          <label for="fMaps">Link Google Maps (opsional)</label>
+          <input class="input" id="fMaps" type="url" inputmode="url" maxlength="400" placeholder="https://maps.app.goo.gl/..." />
+          <p class="hint hint--tight">Buka kos di Google Maps, tekan Bagikan, lalu salin link-nya. Alamat di daftar jadi bisa diklik.</p>
+          <p class="err" data-err="fMaps"></p>
+        </div>
+        <div class="f f--2">
+          <div>
+            <label for="fJenis">Jenis</label>
+            <select class="input" id="fJenis">
+              <option value="putra">Putra</option>
+              <option value="putri">Putri</option>
+              <option value="campur">Campur</option>
+            </select>
+          </div>
+          <div>
+            <label for="fHarga">Harga per bulan (Rp)</label>
+            <input class="input" id="fHarga" type="number" min="0" step="10000" inputmode="numeric" />
+            <p class="err" data-err="fHarga"></p>
+          </div>
+        </div>
+        <fieldset class="f">
+          <legend>Fasilitas</legend>
+          <input class="input facsearch" id="fFacQ" type="search" placeholder="Cari fasilitas (mis. a)" autocomplete="off" aria-label="Cari fasilitas" />
+          <div class="facgrid" id="fFac"></div>
+          <p class="hint hint--tight" id="fFacNone" hidden>Tidak ada yang cocok. Tambahkan lewat "+ Tambah fasilitas baru" di bawah.</p>
+          <span class="sublabel" id="fFacNew">Fasilitas baru</span>
+          <div class="fx" id="fFacX"></div>
+          <button type="button" class="btn btn--outline btn--sm" id="fFacAdd">+ Tambah fasilitas baru</button>
+          <p class="hint hint--tight">Fasilitas yang belum ada di daftar (mis. Kulkas) otomatis tersimpan ke database dan muncul sebagai pilihan di form ini dan di filter. Selanjutnya cukup dicentang.</p>
+        </fieldset>
+        <fieldset class="f">
+          <legend>Pemilik &amp; nomor HP / WhatsApp</legend>
+          <div class="kon" id="fKon"></div>
+          <button type="button" class="btn btn--outline btn--sm" id="fKonAdd">+ Tambah pemilik / nomor</button>
+        </fieldset>
+        <div class="f f--2">
+          <div>
+            <label for="fRating">Rating Google Maps (0 sampai 5)</label>
+            <input class="input" id="fRating" type="number" min="0" max="5" step="0.1" inputmode="decimal" placeholder="mis. 4.6" />
+            <p class="err" data-err="fRating"></p>
+          </div>
+          <div>
+            <label for="fKamar">Ketersediaan kamar (jumlah kamar kosong)</label>
+            <input class="input" id="fKamar" type="number" min="0" step="1" inputmode="numeric" placeholder="mis. 3 (isi 0 jika penuh)" />
+            <p class="err" data-err="fKamar"></p>
+          </div>
+        </div>
+        <div class="f">
+          <label for="fDesk">Deskripsi (opsional)</label>
+          <textarea class="input" id="fDesk" rows="3" maxlength="500"></textarea>
+        </div>
+        <div class="f">
+          <span class="lbl">Foto sampul (tampil di kartu, maksimal 5)</span>
+          <div class="photos" id="fPhotos"></div>
+          <label class="btn btn--outline btn--sm filebtn">Pilih foto sampul
+            <input type="file" id="fFile" class="sr" accept="image/*" multiple />
+          </label>
+          <p class="err" data-err="fFile"></p>
+        </div>
+        <div class="f f--media">
+          <span class="lbl">Foto &amp; video detail kamar (tampil di Info)</span>
+          <p class="hint">Contoh: kamar tidur, kamar mandi/toilet, AC, TV. Beri label di tiap file. Video maksimal 50 MB (MP4 paling aman).</p>
+          <div class="mlist" id="fMedia"></div>
+          <label class="btn btn--outline btn--sm filebtn">Tambah foto / video
+            <input type="file" id="fMediaFile" class="sr" accept="image/*,video/*,.mp4,.mov,.m4v,.webm,.3gp" multiple />
+          </label>
+          <datalist id="labelOpts">
+            <option value="Kamar tidur"></option><option value="Kamar mandi"></option><option value="Toilet"></option>
+            <option value="AC"></option><option value="TV"></option><option value="Kasur"></option>
+            <option value="Lemari"></option><option value="Meja"></option><option value="Dapur bersama"></option>
+            <option value="Parkir"></option><option value="Tampak depan"></option>
+          </datalist>
+          <p class="err" data-err="fMedia"></p>
+        </div>
+        <p class="err err--save" data-err="fSave"></p>
+      </div>
+      <div class="dlg__foot">
+        <button type="button" class="btn btn--outline" data-close>Batal</button>
+        <button type="submit" class="btn btn--yellow">Simpan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== Dialog: import kos dari CSV ===== -->
+  <dialog id="importDlg" class="dlg dlg--import" aria-labelledby="impTitle">
+    <div class="dlg__head">
+      <h2 id="impTitle">Import kos dari CSV</h2>
+      <button type="button" class="iconbtn" data-close aria-label="Tutup">&times;</button>
+    </div>
+    <div class="dlg__body">
+      <p class="imp__file" id="impFile"></p>
+      <div class="imp__sum" id="impSum"></div>
+      <p class="imp__note" id="impNote"></p>
+      <div class="imp__photos" id="impPhotoBox" hidden>
+        <p><b>Foto sampul</b> &middot; <span id="impPhotoSum">0 file foto terpilih</span></p>
+        <p class="hint">CSV hanya berisi nama file foto. Pilih file fotonya di sini (boleh banyak sekaligus, atau satu folder). Nama file harus sama dengan yang ditulis di CSV, dan foto otomatis diunggah saat klik Masukkan.</p>
+        <div class="imp__pbtns">
+          <label class="btn btn--outline btn--sm filebtn">Pilih foto<input type="file" class="sr" id="impPhotoFile" accept="image/*" multiple></label>
+          <label class="btn btn--outline btn--sm filebtn">Pilih folder<input type="file" class="sr" id="impPhotoDir" webkitdirectory multiple></label>
+        </div>
+      </div>
+      <label class="imp__dup" id="impDupWrap" hidden><input type="checkbox" id="impDup"> Masukkan juga kos yang terdeteksi duplikat</label>
+      <div class="imp__tablewrap"><table class="imp__table" id="impTable"></table></div>
+      <div class="imp__prog" id="impProg" hidden><div class="imp__bar"><span id="impBar"></span></div><p id="impProgTxt"></p></div>
+      <p class="err err--save" data-err="impErr"></p>
+    </div>
+    <div class="dlg__foot">
+      <button type="button" class="btn btn--outline" data-close id="impCancel">Batal</button>
+      <button type="button" class="btn btn--yellow" id="impGo">Masukkan</button>
+    </div>
+  </dialog>
+
+  <!-- ===== Dialog: hapus kos ===== -->
+  <dialog id="delDlg" class="dlg dlg--sm" aria-labelledby="delTitle">
+    <div class="dlg__head"><h2 id="delTitle">Hapus kos?</h2></div>
+    <div class="dlg__body"><p id="delText"></p><p class="err" data-err="del"></p></div>
+    <div class="dlg__foot">
+      <button type="button" class="btn btn--outline" data-close>Batal</button>
+      <button type="button" class="btn btn--pink" id="delOk">Ya, hapus</button>
+    </div>
+  </dialog>
+
+  <!-- ===== Dialog: buat / edit username ===== -->
+  <dialog id="cDlg" class="dlg" aria-labelledby="cTitle">
+    <form id="cForm" novalidate>
+      <div class="dlg__head">
+        <h2 id="cTitle">Buat username</h2>
+        <button type="button" class="iconbtn" data-close aria-label="Tutup">&times;</button>
+      </div>
+      <div class="dlg__body">
+        <div class="f f--2">
+          <div>
+            <label for="cNama">Nama client</label>
+            <input class="input" id="cNama" maxlength="60" autocomplete="off" />
+            <p class="err" data-err="cNama"></p>
+          </div>
+          <div>
+            <label for="cHp">Nomor WA client</label>
+            <input class="input" id="cHp" type="tel" inputmode="tel" autocomplete="off" maxlength="30" placeholder="08123456789" />
+            <p class="err" data-err="cHp"></p>
+          </div>
+        </div>
+        <div class="f">
+          <label for="cUser">Username (dipakai client untuk masuk)</label>
+          <div class="inrow">
+            <input class="input" id="cUser" maxlength="30" autocomplete="off" autocapitalize="none" spellcheck="false" />
+            <button type="button" class="btn btn--outline btn--sm" id="cGen">Acak</button>
+          </div>
+          <p class="hint hint--tight">Username ini seperti kunci masuk. Pakai yang sulit ditebak (tombol Acak sudah menambah kode acak).</p>
+          <p class="err" data-err="cUser"></p>
+        </div>
+        <div class="f f--2">
+          <div>
+            <label for="cDurasi">Durasi sesi (menit)</label>
+            <input class="input" id="cDurasi" type="number" min="1" max="60" step="1" inputmode="numeric" value="10" />
+            <p class="err" data-err="cDurasi"></p>
+          </div>
+          <div>
+            <label for="cJenis">Jenis kos yang dicari</label>
+            <select class="input" id="cJenis">
+              <option value="semua">Semua / belum ditentukan</option>
+              <option value="putra">Putra</option>
+              <option value="putri">Putri</option>
+              <option value="campur">Campur</option>
+            </select>
+          </div>
+        </div>
+        <div class="f f--2">
+          <div>
+            <label for="cMin">Harga minimal (Rp)</label>
+            <input class="input" id="cMin" type="number" min="0" step="50000" inputmode="numeric" placeholder="opsional" />
+            <p class="err" data-err="cMin"></p>
+          </div>
+          <div>
+            <label for="cMax">Harga maksimal (Rp)</label>
+            <input class="input" id="cMax" type="number" min="0" step="50000" inputmode="numeric" placeholder="opsional" />
+          </div>
+        </div>
+        <div class="f">
+          <label for="cLok">Letak kos yang diinginkan</label>
+          <input class="input" id="cLok" maxlength="80" placeholder="mis. dekat kampus atau pusat kota" />
+        </div>
+        <div class="f">
+          <div class="pickhead">
+            <span class="lbl">Pilih kos yang cocok (bebas, berapa pun)</span>
+            <span class="pickn" id="cPickN">0 dipilih</span>
+          </div>
+          <div class="searchbar searchbar--sm">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+            <label class="sr" for="cPickQ">Cari kos</label>
+            <input id="cPickQ" type="search" placeholder="Cari nama atau alamat kos" autocomplete="off" />
+          </div>
+          <div class="picklist" id="cPick"></div>
+          <p class="hint hint--tight">Label Jenis / Harga / Lokasi menandai kos yang cocok dengan kebutuhan di atas. Hijau = kamar tersedia (disarankan), merah = kamar penuh (tidak disarankan).</p>
+          <p class="err" data-err="cKos"></p>
+        </div>
+        <p class="err err--save" data-err="cSave"></p>
+      </div>
+      <div class="dlg__foot">
+        <button type="button" class="btn btn--outline" data-close>Batal</button>
+        <button type="submit" class="btn btn--yellow">Simpan</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ===== Dialog: hapus username ===== -->
+  <dialog id="cDelDlg" class="dlg dlg--sm" aria-labelledby="cDelTitle">
+    <div class="dlg__head"><h2 id="cDelTitle">Hapus username?</h2></div>
+    <div class="dlg__body"><p id="cDelText"></p><p class="err" data-err="cdel"></p></div>
+    <div class="dlg__foot">
+      <button type="button" class="btn btn--outline" data-close>Batal</button>
+      <button type="button" class="btn btn--pink" id="cDelOk">Ya, hapus</button>
+    </div>
+  </dialog>
+
+  <!-- ===== Dialog: Info kos ===== -->
+  <dialog id="infoDlg" class="dlg dlg--info" aria-labelledby="infoTitle">
+    <div class="dlg__head">
+      <h2 id="infoTitle">Info kos</h2>
+      <button type="button" class="iconbtn" data-close aria-label="Tutup">&times;</button>
+    </div>
+    <div class="dlg__body dlg__body--info" id="infoBody"></div>
+  </dialog>
+
+  <!-- ===== Dialog: foto sampul ===== -->
+  <dialog id="lightbox" class="lightbox" aria-label="Foto kos">
+    <button type="button" class="lb__close" data-close aria-label="Tutup">&times;</button>
+    <button type="button" class="lb__nav lb__prev" id="lbPrev" aria-label="Foto sebelumnya">&#8249;</button>
+    <figure>
+      <img id="lbImg" alt="" />
+      <figcaption id="lbCap"></figcaption>
+    </figure>
+    <button type="button" class="lb__nav lb__next" id="lbNext" aria-label="Foto berikutnya">&#8250;</button>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <div id="printSheet" aria-hidden="true"></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/demo.js"></script>
+  <script src="js/catalog.js"></script>
+  <script src="js/import.js"></script>
+  <script src="js/clients.js"></script>
+  <script src="js/pantau.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/ticker.js"></script>
+</body>
+</html>
